@@ -1,4 +1,6 @@
 .venv
+.vscode
+
 .env
 last_ip
 log
