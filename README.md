@@ -6,7 +6,7 @@ Dynamic DNS for [gen.xyz](https://gen.xyz/)
 ```shell
 $ pip install -r requirements.txt
 ```
-2. Edit `.env` to your needs
+2. Edit `env.json` to your needs
 
 ## Usage
 Use `crontab` to run python script periodically.

@@ -1,16 +1,12 @@
 import requests
 import os
-from dotenv import dotenv_values
-
-config = {**dotenv_values(".env")}
-
+import json
 
 def read_previous_ip():
     dir_path = os.path.dirname(os.path.realpath(__file__)) + "/last_ip"
     if not os.path.exists(dir_path):
         with open(dir_path, "w") as file:
             file.write("0.0.0.0")
-
     oldIPFile = open(dir_path, "r")
     oldIP = oldIPFile.readlines()[0]
     oldIPFile.close()
@@ -63,6 +59,10 @@ def update_ddns(session, domainId, host, newIP):
     return response
 
 
+def read_env():
+    with open("env.json") as file:
+            return json.load(file)
+
 if __name__ == "__main__":
     try:
         newIP = read_current_ip()
@@ -77,9 +77,11 @@ if __name__ == "__main__":
 
     write_new_ip(newIP)
 
+    config = read_env()
+
     session = requests.session()
-    login(session, config["LOGIN_MAIL"], config["LOGIN_PASSWORD"])
-    res = update_ddns(session, config["DOMAIN_ID"], config["DNS_HOST"], newIP)
+    login(session, config["user"]["mail"], config["user"]["password"])
+    res = update_ddns(session, config["domainID"], config["host"], newIP)
     if res.ok:
         print("Updated")
     else:
