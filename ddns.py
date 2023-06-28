@@ -1,6 +1,8 @@
 import requests
 import os
 import json
+from urllib.parse import urlencode
+
 
 def read_previous_ip():
     dir_path = os.path.dirname(os.path.realpath(__file__)) + "/last_ip"
@@ -36,17 +38,25 @@ def login(session, mail, password):
     return response
 
 
-def update_ddns(session, domainId, host, newIP):
+def update_ddns(session, domainId, hosts, newIP):
     url = "https://gen.xyz/account/clientarea.php"
     querystring = {"action": "domaindns"}
-    payload = {
+    payloadHead = {
         "masked-redirect": "",
         "sub": "save",
         "domainid": domainId,
-        "dnsrecordhost[]": host,
-        "dnsrecordtype[]": "A",
-        "dnsrecordaddress[]": newIP,
     }
+
+    payloadHosts = []
+    for host in hosts:
+        hostPl = {
+            "dnsrecordhost[]": host,
+            "dnsrecordtype[]": "A",
+            "dnsrecordaddress[]": newIP,
+        }
+        payloadHosts.append(urlencode(hostPl))
+
+    payload = urlencode(payloadHead) + "&" + "&".join(payloadHosts)
     headers = {"content-type": "application/x-www-form-urlencoded"}
     response = session.request(
         "POST",
@@ -61,7 +71,8 @@ def update_ddns(session, domainId, host, newIP):
 
 def read_env():
     with open("env.json") as file:
-            return json.load(file)
+        return json.load(file)
+
 
 if __name__ == "__main__":
     try:
@@ -81,7 +92,7 @@ if __name__ == "__main__":
 
     session = requests.session()
     login(session, config["user"]["mail"], config["user"]["password"])
-    res = update_ddns(session, config["domainID"], config["host"], newIP)
+    res = update_ddns(session, config["domainID"], config["hosts"], newIP)
     if res.ok:
         print("Updated")
     else:
