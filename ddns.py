@@ -2,6 +2,7 @@ import requests
 import os
 import json
 from urllib.parse import urlencode
+from sys import argv
 
 
 class Record:
@@ -91,7 +92,7 @@ if __name__ == "__main__":
     oldIP = read_previous_ip()
     print("Old: " + oldIP + " vs New: " + newIP)
 
-    if newIP == oldIP:
+    if newIP == oldIP and "-f" not in argv:
         quit()
 
     write_new_ip(newIP)
