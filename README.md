@@ -1,6 +1,8 @@
 # ddns.xyz
 Dynamic DNS for [gen.xyz](https://gen.xyz/)
 
+I'm not affiliated with the Register in any way. This is a script for personal use, but welcome to suggestions.
+
 ## Installation
 1. Install dependencies
 ```shell
