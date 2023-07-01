@@ -8,7 +8,7 @@ I'm not affiliated with the Register in any way. This is a script for personal u
 ```shell
 $ pip install -r requirements.txt
 ```
-2. Edit `env.json` to your needs
+2. Rename `env.json.example` to `env.json`, follow and *remove comments*
 
 ## Usage
 Use `crontab` to run python script periodically.

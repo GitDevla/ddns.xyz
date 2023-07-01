@@ -4,6 +4,21 @@ import json
 from urllib.parse import urlencode
 
 
+class Record:
+    def __init__(self, host, type, address):
+        self.host = host
+        self.type = type
+        self.address = address
+
+    def urlencode(self):
+        url = {
+            "dnsrecordhost[]": self.host,
+            "dnsrecordtype[]": self.type,
+            "dnsrecordaddress[]": self.address,
+        }
+        return urlencode(url)
+
+
 def read_previous_ip():
     dir_path = os.path.dirname(os.path.realpath(__file__)) + "/last_ip"
     if not os.path.exists(dir_path):
@@ -38,7 +53,7 @@ def login(session, mail, password):
     return response
 
 
-def update_ddns(session, domainId, hosts, newIP):
+def update_ddns(session, domainId, hosts):
     url = "https://gen.xyz/account/clientarea.php"
     querystring = {"action": "domaindns"}
     payloadHead = {
@@ -47,14 +62,7 @@ def update_ddns(session, domainId, hosts, newIP):
         "domainid": domainId,
     }
 
-    payloadHosts = []
-    for host in hosts:
-        hostPl = {
-            "dnsrecordhost[]": host,
-            "dnsrecordtype[]": "A",
-            "dnsrecordaddress[]": newIP,
-        }
-        payloadHosts.append(urlencode(hostPl))
+    payloadHosts = [i.urlencode() for i in hosts]
 
     payload = urlencode(payloadHead) + "&" + "&".join(payloadHosts)
     headers = {"content-type": "application/x-www-form-urlencoded"}
@@ -90,9 +98,14 @@ if __name__ == "__main__":
 
     config = read_env()
 
+    hosts = [
+        Record(i["name"], i["type"], i["address"] or newIP) for i in config["hosts"]
+    ]
+
     session = requests.session()
     login(session, config["user"]["mail"], config["user"]["password"])
-    res = update_ddns(session, config["domainID"], config["hosts"], newIP)
+    res = update_ddns(session, config["domainID"], hosts)
+
     if res.ok:
         print("Updated")
     else:
